@@ -84,10 +84,17 @@ export async function getManifestUrl(c: Context, version: {
       if (!entry.s3_path)
         return null
 
+      // Make sure s3_path is url safe untill CLI is fixed TODO: remove in january 2025
+      const safeS3Path = entry.s3_path.replace(/ /g, '%20')
+      const fileName = entry.file_name?.replace(/ /g, '%20')
+      // if safeS3Path start and end with " remove them
+      const safeS3PathQuotes = safeS3Path.startsWith('"') && safeS3Path.endsWith('"') ? safeS3Path.slice(1, -1) : safeS3Path
+      const fileNameQuotes = fileName?.startsWith('"') && fileName?.endsWith('"') ? fileName.slice(1, -1) : fileName
+
       return {
-        file_name: entry.file_name,
+        file_name: fileNameQuotes,
         file_hash: entry.file_hash,
-        download_url: `${url.protocol}//${url.host}/${BASE_PATH}/${entry.s3_path}?key=${signKey}`,
+        download_url: `${url.protocol}//${url.host}/${BASE_PATH}/${safeS3PathQuotes}?key=${signKey}`,
       }
     }).filter(entry => entry !== null) as ManifestEntry[]
   }
