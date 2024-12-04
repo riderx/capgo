@@ -51,12 +51,12 @@ watch(channel, async (channel) => {
 
 const tabs: Tab[] = [
   {
-    label: t('info'),
+    label: 'info',
     icon: IconInformations,
     key: 'info',
   },
   {
-    label: t('channel-forced-devices'),
+    label:'channel-forced-devices',
     icon: IconDevice,
     key: 'devices',
   },

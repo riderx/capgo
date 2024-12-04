@@ -55,12 +55,12 @@ const revertToNativeVersion = ref<Database['public']['Functions']['check_revert_
 
 const tabs: Tab[] = [
   {
-    label: t('info'),
+    label: 'info',
     icon: IconInformations,
     key: 'info',
   },
   {
-    label: t('logs'),
+    label: 'logs',
     icon: IconLog,
     key: 'logs',
   },

@@ -75,12 +75,12 @@ async function copyToast(text: string) {
 
 const tabs: Tab[] = [
   {
-    label: t('info'),
+    label: 'info',
     icon: IconInformations,
     key: 'info',
   },
   {
-    label: t('devices'),
+    label: 'devices',
     icon: IconDevice,
     key: 'devices',
   },
