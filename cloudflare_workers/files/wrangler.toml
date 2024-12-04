@@ -26,6 +26,7 @@ name = "capgo_files-preprod"
 routes = [
   { pattern = "files-preprod.capgo.app", custom_domain = true },
   { pattern = "api-preprod.capgo.app/private/files*", zone_name = "capgo.app" },
+  { pattern = "plugin-preprod.capgo.app/files*", zone_name = "capgo.app" },
   { pattern = "api-preprod.capgo.app/files*", zone_name = "capgo.app" },
   { pattern = "api-preprod.capgo.app/private/download_link", zone_name = "capgo.app" },
 ]
@@ -39,6 +40,7 @@ name = "capgo_files-alpha"
 routes = [
   { pattern = "files-alpha.capgo.app", custom_domain = true },
   { pattern = "api-alpha.capgo.app/private/files*", zone_name = "capgo.app" }, # TODO: remove this when all users have been migrated
+  { pattern = "plugin-alpha.capgo.app/files*", zone_name = "capgo.app" },
   { pattern = "api-alpha.capgo.app/files*", zone_name = "capgo.app" },
   { pattern = "api-alpha.capgo.app/private/download_link", zone_name = "capgo.app" },
 ]
