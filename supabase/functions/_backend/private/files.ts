@@ -73,7 +73,7 @@ async function getHandler(c: Context): Promise<Response> {
   else {
     headers.set('Content-Disposition', `attachment; filename="${object.key}"`)
     response = new Response(object.body, { headers })
-    c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()))
+    backgroundTask(c, cache.put(cacheKey, response.clone()))
     return response
   }
 }

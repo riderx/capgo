@@ -3,6 +3,10 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './supabase.types.ts'
 import { env, getRuntimeKey } from 'hono/adapter'
 
+declare const EdgeRuntime: {
+  waitUntil: (promise: Promise<any>) => void
+}
+
 export const fetchLimit = 50
 
 // Regex for Zod validation of an app id
@@ -116,6 +120,10 @@ export function isLimited(c: Context, id: string) {
 export function backgroundTask(c: Context, p: any) {
   if (getRuntimeKey() === 'workerd') {
     c.executionCtx.waitUntil(p)
+    return Promise.resolve(null)
+  }
+  if (EdgeRuntime) {
+    EdgeRuntime.waitUntil(p)
     return Promise.resolve(null)
   }
   return p

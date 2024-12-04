@@ -2,6 +2,7 @@ import type { Context } from '@hono/hono'
 import { Hono } from 'hono/tiny'
 import { cleanFieldsAppVersions } from '../triggers/replicate_data.ts'
 import { supabaseAdmin } from '../utils/supabase.ts'
+import { backgroundTask } from '../utils/utils.ts'
 
 export const app = new Hono()
 
@@ -173,11 +174,11 @@ app.get('/', async (c: Context) => {
       }
       if (d1Count <= pgCount) {
         console.log({ requestId: c.get('requestId'), context: `Syncing missing rows for table ${table}` })
-        c.executionCtx.waitUntil(syncMissingRows(c, table))
+        backgroundTask(c, syncMissingRows(c, table))
       }
       else if (d1Count > pgCount) {
         console.log({ requestId: c.get('requestId'), context: `Deleting extra rows for table ${table}` })
-        c.executionCtx.waitUntil(deleteExtraRows(c, table))
+        backgroundTask(c, deleteExtraRows(c, table))
       }
       return acc
     }, {} as Record<string, { d1: number, supabase: number, percent: number }>)

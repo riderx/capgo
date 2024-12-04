@@ -97,7 +97,7 @@ export function readDevices(c: Context, app_id: string, range_start: number, ran
   return readDevicesCF(c, app_id, range_start, range_end, version_id, deviceIds, search, order)
 }
 
-export function sendStatsAndDevice(c: Context, device: DeviceWithoutCreatedAt, statsActions: StatsActions[]) {
+export async function sendStatsAndDevice(c: Context, device: DeviceWithoutCreatedAt, statsActions: StatsActions[]) {
   // Prepare the device data for insertion
 
   device.device_id = device.device_id.toLowerCase()
@@ -112,7 +112,7 @@ export function sendStatsAndDevice(c: Context, device: DeviceWithoutCreatedAt, s
   jobs.push(createStatsDevices(c, device.app_id, device.device_id, device.version, device.platform ?? 'android', device.plugin_version ?? '', device.os_version ?? '', device.version_build ?? '', device.custom_id ?? '', device.is_prod ?? true, device.is_emulator ?? false))
 
   if (getRuntimeKey() === 'workerd') {
-    c.executionCtx.waitUntil(Promise.all(jobs))
+    await backgroundTask(c, Promise.all(jobs))
     return Promise.resolve()
   }
   else {

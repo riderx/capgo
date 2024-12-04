@@ -4,6 +4,7 @@ import type { Database } from '../utils/supabase.types.ts'
 import { Hono } from 'hono/tiny'
 import { BRES, middlewareAPISecret } from '../utils/hono.ts'
 import { supabaseAdmin } from '../utils/supabase.ts'
+import { backgroundTask } from '../utils/utils.ts'
 
 export const app = new Hono()
 
@@ -79,9 +80,9 @@ export function cleanFieldsAppVersions(record: any, table: string) {
   return record
 }
 
-// function to c.executionCtx.waitUntil the db operation and catch issue who insert in job_queue as failed job
+// function to backgroundTask the db operation and catch issue who insert in job_queue as failed job
 function asyncWrap(c: Context, promise: Promise<any>, payload: any, retry_count: number) {
-  c.executionCtx.waitUntil(promise.catch((e) => {
+  backgroundTask(c, promise.catch((e) => {
     console.error({ requestId: c.get('requestId'), context: 'Error in replicateData', error: e })
     // if error is { "error": "D1_ERROR: UNIQUE constraint failed: apps.name: SQLITE_CONSTRAINT" } or any Unique constraint failed return as success
     if (e.message.includes('UNIQUE constraint failed')) {
