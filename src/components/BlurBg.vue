@@ -23,7 +23,7 @@ const style = computed(() => ({ background: props.background }))
 
       <div class="absolute rounded-xl from-cyan-500 to-purple-500 bg-gradient-to-r -inset-px" />
 
-      <div class="relative flex flex-col items-stretch overflow-hidden text-center bg-white rounded-xl dark:bg-black dark:bg-opacity-90 md:flex-row md:text-left">
+      <div class="relative flex flex-col items-stretch overflow-hidden text-center bg-white rounded-xl dark:bg-black/90 md:flex-row md:text-left">
         <slot />
       </div>
     </div>

@@ -1,6 +1,5 @@
 const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
-const plugin = require('tailwindcss/plugin')
 
 // https://icon-sets.iconify.design/
 const primary = '#515271'
@@ -28,7 +27,7 @@ module.exports = {
           neutral,
           'base-100': base100,
           info,
-          "--border-btn": "0.5px",
+          '--border-btn': '0.5px',
         },
       },
     ],

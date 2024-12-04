@@ -15,6 +15,7 @@
     "sync:ios": "cap sync ios",
     "sync:android": "cap sync android",
     "serve": "vite",
+    "dev": "vite",
     "prebuild-serve-dev": "ENV=local vite build --sourcemap true --minify false --assetsDir . && http-server ./dist -p 5173",
     "serve-dev": "ENV=local vite",
     "backend": "supabase start && supabase functions serve",
