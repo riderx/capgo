@@ -85,11 +85,9 @@ export async function getManifestUrl(c: Context, version: {
         return null
 
       // Make sure s3_path is url safe untill CLI is fixed TODO: remove in january 2025
-      const safeS3Path = entry.s3_path.replace(/ /g, '%20')
-      const fileName = entry.file_name?.replace(/ /g, '%20')
       // if safeS3Path start and end with " remove them
-      const safeS3PathQuotes = safeS3Path.startsWith('"') && safeS3Path.endsWith('"') ? safeS3Path.slice(1, -1) : safeS3Path
-      const fileNameQuotes = fileName?.startsWith('"') && fileName?.endsWith('"') ? fileName.slice(1, -1) : fileName
+      const safeS3PathQuotes = entry.s3_path.startsWith('"') && entry.s3_path.endsWith('"') ? entry.s3_path.slice(1, -1) : entry.s3_path
+      const fileNameQuotes = entry.file_name?.startsWith('"') && entry.file_name?.endsWith('"') ? entry.file_name.slice(1, -1) : entry.file_name
 
       return {
         file_name: fileNameQuotes,
