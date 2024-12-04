@@ -159,6 +159,7 @@ app.get('/', async (c: Context) => {
       supabase: 0,
       percent: 0,
     }
+    const allJobs: Promise<void>[] = []
     const diff = tables.reduce((acc, table, index) => {
       const d1Count = (d1Counts[index]?.count as number) || 0
       const pgCount = pgCounts[index]?.count || 0
@@ -174,14 +175,15 @@ app.get('/', async (c: Context) => {
       }
       if (d1Count <= pgCount) {
         console.log({ requestId: c.get('requestId'), context: `Syncing missing rows for table ${table}` })
-        backgroundTask(c, syncMissingRows(c, table))
+        allJobs.push(syncMissingRows(c, table))
       }
       else if (d1Count > pgCount) {
         console.log({ requestId: c.get('requestId'), context: `Deleting extra rows for table ${table}` })
-        backgroundTask(c, deleteExtraRows(c, table))
+        allJobs.push(deleteExtraRows(c, table))
       }
       return acc
     }, {} as Record<string, { d1: number, supabase: number, percent: number }>)
+    await backgroundTask(c, Promise.all(allJobs))
     // if diff less than 1% of total rows, consider it as synced
     const totalPercent = Object.values(diff).reduce((acc, table) => acc + table.percent, 0)
     const diffPercentage = totalPercent / Object.keys(diff).length
