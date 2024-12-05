@@ -84,8 +84,7 @@ export async function getManifestUrl(c: Context, version: {
       if (!entry.s3_path)
         return null
 
-      // Make sure s3_path is url safe untill CLI is fixed TODO: remove in january 2025
-      // if safeS3Path start and end with " remove them
+      // Make sure s3_path is url safe and remove quotes if present because of space names TODO: find a way to make the cli not require quotes
       const safeS3PathQuotes = entry.s3_path.startsWith('"') && entry.s3_path.endsWith('"') ? entry.s3_path.slice(1, -1) : entry.s3_path
       const fileNameQuotes = entry.file_name?.startsWith('"') && entry.file_name?.endsWith('"') ? entry.file_name.slice(1, -1) : entry.file_name
 
