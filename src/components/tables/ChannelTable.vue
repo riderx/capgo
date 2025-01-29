@@ -22,6 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'misconfigured', misconfigured: boolean): void
+  (event: 'capgo-lite', capgoLite: string): void
 }>()
 
 interface Channel {
@@ -121,6 +122,7 @@ async function getData() {
           name,
           app_id,
           public,
+          is_lite,
           version (
             name,
             created_at,
@@ -154,16 +156,19 @@ async function getData() {
     // This will trigger if the channel disables updates based on metadata + if the metadata is undefined
     let anyMisconfigured = false
     const channels = dataVersions
-      .filter(e => e.disable_auto_update === 'version_number')
+      .filter(e => e.disable_auto_update === 'version_number' || e.is_lite)
       .map(e => e as any as Element)
 
     for (const channel of channels) {
-      if (channel.version.min_update_version === null) {
+      if (channel.disable_auto_update === 'version_number' && channel.version.min_update_version === null) {
         channel.misconfigured = true
         anyMisconfigured = true
       }
+      if (channel.is_lite) {
+        console.log('capgo-lite', channel.name)
+        emit('capgo-lite', channel.name)
+      }
     }
-
     // Inform the parent component if there are any misconfigured channels
     emit('misconfigured', anyMisconfigured)
   }

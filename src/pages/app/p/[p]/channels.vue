@@ -9,6 +9,7 @@ const route = useRoute('/app/p/[p]/channels')
 const displayStore = useDisplayStore()
 const appId = ref('')
 const misconfiguredRef = ref(false)
+const capgoLite = ref('')
 const { t } = useI18n()
 
 watchEffect(async () => {
@@ -27,8 +28,11 @@ watchEffect(async () => {
       <div v-if="misconfiguredRef" id="error-missconfig" class="mt-2 mb-4 bg-[#ef4444] text-white w-fit ml-auto mr-auto border-8 rounded-2xl border-[#ef4444]">
         {{ t('misconfigured-channels') }}
       </div>
+      <div v-if="capgoLite" id="error-missconfig" class="mt-2 mb-4 bg-[#ef9144] text-white w-fit ml-auto mr-auto border-8 rounded-2xl border-[#ef9144]">
+        {{ t('capgo-lite-channels').replace('%1', capgoLite) }}
+      </div>
       <div id="versions" class="flex flex-col mx-auto overflow-y-auto bg-white border rounded-lg shadow-lg border-slate-300 md:mt-5 md:w-2/3 dark:border-slate-900 dark:bg-gray-800">
-        <ChannelTable :app-id="appId" @misconfigured="(misconfigured) => misconfiguredRef = misconfigured" />
+        <ChannelTable :app-id="appId" @capgo-lite="(newCapgoLite) => capgoLite = newCapgoLite" @misconfigured="(misconfigured) => misconfiguredRef = misconfigured" />
       </div>
     </div>
   </div>

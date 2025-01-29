@@ -34,6 +34,7 @@ const loading = ref(true)
 const deviceIds = ref<string[]>([])
 const channel = ref<Database['public']['Tables']['channels']['Row'] & Channel>()
 const ActiveTab = ref('info')
+const capgoLite = ref(false)
 
 const role = ref<OrganizationRole | null>(null)
 watch(channel, async (channel) => {
@@ -44,6 +45,7 @@ watch(channel, async (channel) => {
 
   await organizationStore.awaitInitialLoad()
   role.value = await organizationStore.getCurrentRoleForApp(channel.app_id)
+  capgoLite.value = channel.is_lite
   console.log(role.value)
 })
 
@@ -114,7 +116,8 @@ async function getChannel() {
           disable_auto_update,
           ios,
           android,
-          updated_at
+          updated_at,
+          is_lite
         `)
       .eq('id', id.value)
       .single()
@@ -257,6 +260,74 @@ async function makeDefault(val = true) {
   }
   displayStore.showDialog = true
   return displayStore.onDialogDismiss()
+}
+
+async function makeLite(val: boolean) {
+  if (!organizationStore.hasPermisisonsInRole(role.value, ['super_admin'])) {
+    toast.error(t('no-permission'))
+    capgoLite.value = !val
+    return
+  }
+  if (!id.value || !channel.value)
+    return
+  if (val) {
+    const publicChannels = await supabase
+      .from('channels')
+      .select('id')
+      .eq('app_id', channel.value.app_id)
+      .eq('public', true)
+    if (publicChannels.data?.length !== 1) {
+      toast.error(t('cannot-make-lite-length'))
+      capgoLite.value = false
+      return
+    }
+    capgoLite.value = true
+    displayStore.dialogOption = {
+      header: t('are-u-sure'),
+      message: t('make-channel-lite'),
+      buttons: [
+        {
+          text: t('confirm'),
+        },
+        {
+          text: t('open-docs'),
+          handler: () => {
+            toast.info('TODO')
+          },
+        },
+      ],
+    }
+    displayStore.showDialog = true
+    if (await displayStore.onDialogDismiss()) {
+      capgoLite.value = false
+      return
+    }
+    const { error } = await supabase
+      .from('channels')
+      .update({ is_lite: true })
+      .eq('id', id.value)
+    if (error) {
+      toast.error(t('error-update-channel'))
+      console.error(error)
+      capgoLite.value = true
+      return
+    }
+    toast.success(t('channel-made-lite'))
+    return
+  }
+  else {
+    const { error } = await supabase
+      .from('channels')
+      .update({ is_lite: false })
+      .eq('id', id.value)
+    if (error) {
+      toast.error(t('error-update-channel'))
+      console.error(error)
+      capgoLite.value = false
+      return
+    }
+    capgoLite.value = false
+  }
 }
 
 async function getUnknownVersion(): Promise<number> {
@@ -452,13 +523,19 @@ function openSelectVersion() {
               @change="() => (makeDefault(!channel?.public))"
             />
           </InfoRow>
-          <InfoRow label="iOS">
+          <InfoRow v-if="channel?.public" :label="t('channel-is-lite')">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input @click="() => makeLite(!capgoLite)" type="checkbox" class="sr-only peer" v-model="capgoLite">
+              <div class="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-0.5 after:h-5 after:w-5 after:border after:border-gray-300 dark:border-gray-600 after:rounded-full after:bg-white dark:bg-gray-700 peer-checked:bg-blue-600 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white" />
+            </label>
+          </InfoRow>
+          <InfoRow v-if="!capgoLite" label="iOS">
             <Toggle
               :value="channel?.ios"
               @change="saveChannelChange('ios', !channel?.ios)"
             />
           </InfoRow>
-          <InfoRow label="Android">
+          <InfoRow v-if="!capgoLite" label="Android">
             <Toggle
               :value="channel?.android"
               @change="saveChannelChange('android', !channel?.android)"
@@ -475,13 +552,13 @@ function openSelectVersion() {
               <option value="major">
                 {{ t('major') }}
               </option>
-              <option value="minor">
+              <option v-if="!capgoLite" value="minor">
                 {{ t('minor') }}
               </option>
-              <option value="patch">
+              <option  v-if="!capgoLite" value="patch">
                 {{ t('patch') }}
               </option>
-              <option value="version_number">
+              <option v-if="!capgoLite" value="version_number">
                 {{ t('metadata') }}
               </option>
               <option value="none">
@@ -489,19 +566,19 @@ function openSelectVersion() {
               </option>
             </select>
           </InfoRow>
-          <InfoRow :label="t('allow-develoment-bui')">
+          <InfoRow  v-if="!capgoLite" :label="t('allow-develoment-bui')">
             <Toggle
               :value="channel?.allow_dev"
               @change="saveChannelChange('allow_dev', !channel?.allow_dev)"
             />
           </InfoRow>
-          <InfoRow :label="t('allow-emulator')">
+          <InfoRow v-if="!capgoLite" :label="t('allow-emulator')">
             <Toggle
               :value="channel?.allow_emulator"
               @change="saveChannelChange('allow_emulator', !channel?.allow_emulator)"
             />
           </InfoRow>
-          <InfoRow :label="t('allow-device-to-self')">
+          <InfoRow v-if="!capgoLite" :label="t('allow-device-to-self')">
             <Toggle
               :value="channel?.allow_device_self_set"
               @change="saveChannelChange('allow_device_self_set', !channel?.allow_device_self_set)"

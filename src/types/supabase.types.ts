@@ -369,6 +369,7 @@ export type Database = {
           disable_auto_update_under_native: boolean
           id: number
           ios: boolean
+          is_lite: boolean
           name: string
           owner_org: string
           public: boolean
@@ -387,6 +388,7 @@ export type Database = {
           disable_auto_update_under_native?: boolean
           id?: number
           ios?: boolean
+          is_lite?: boolean
           name: string
           owner_org: string
           public?: boolean
@@ -405,6 +407,7 @@ export type Database = {
           disable_auto_update_under_native?: boolean
           id?: number
           ios?: boolean
+          is_lite?: boolean
           name?: string
           owner_org?: string
           public?: boolean
